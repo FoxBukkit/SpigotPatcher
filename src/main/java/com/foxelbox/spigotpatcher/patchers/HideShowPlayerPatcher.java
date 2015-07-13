@@ -11,7 +11,7 @@ public class HideShowPlayerPatcher implements MethodPatcher {
         return new MethodPatcherVisitor(api, parent) {
             @Override
             protected boolean checkMethodInsn(int opcode, String clazz, String name, String desc) {
-                if(opcode == Opcodes.INVOKEVIRTUAL && clazz.endsWith("PlayerConnection") && name.equals("sendPacket")) {
+                if(opcode == Opcodes.INVOKEVIRTUAL && clazz.endsWith("/PlayerConnection") && name.equals("sendPacket")) {
                     visitInsn(Opcodes.POP);
                     visitInsn(Opcodes.ACONST_NULL);
                     System.out.println("HideShowPatcher: PATCHED (2 times = OK)");
