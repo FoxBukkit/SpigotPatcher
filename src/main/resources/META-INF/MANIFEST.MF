@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Premain-Class: com.foxelbox.spigotpatcher.SpigotPatcherPremain
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
+Can-Set-Native-Method-Prefix: true
+
+Name: com/foxelbox/spigotpatcher/
+Sealed: true
