@@ -1,5 +1,6 @@
 package com.foxelbox.spigotpatcher;
 
+import com.foxelbox.spigotpatcher.patchers.GetOnlinePlayersPatcher;
 import com.foxelbox.spigotpatcher.patchers.HideShowPlayerPatcher;
 import com.foxelbox.spigotpatcher.patchers.OnPlayerJoinDisconnectPatcher;
 import org.objectweb.asm.*;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 
 public class ClassVisitorPatcher extends ClassVisitor {
     static HashMap<String, HashMap<String, MethodPatcher>> methodVisitors = new HashMap<>();
+    static boolean haveCraftServer = false;
 
     static void addPatcher(String clazz, String method, MethodPatcher patcher) {
         HashMap<String, MethodPatcher> patcherMap = methodVisitors.get(clazz);
@@ -38,7 +40,13 @@ public class ClassVisitorPatcher extends ClassVisitor {
                 ClassVisitorPatcher patcher = new ClassVisitorPatcher(classWriter, methodVisitors.remove(myClassName));
                 classReader.accept(patcher, 0);
                 return classWriter.toByteArray();
-            } else if(methodVisitors.isEmpty()) {
+            } else if(myClassName.equals("CraftServer")) {
+                ClassReader classReader = new ClassReader(classfileBuffer);
+                ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+                classReader.accept(new GetOnlinePlayersPatcher(classWriter), 0);
+                haveCraftServer = true;
+                return classWriter.toByteArray();
+            } else if(methodVisitors.isEmpty() && haveCraftServer) {
                 SpigotPatcherPremain.instrumentation.removeTransformer(this);
                 SpigotPatcherPremain.instrumentation = null;
                 methodVisitors = null;
