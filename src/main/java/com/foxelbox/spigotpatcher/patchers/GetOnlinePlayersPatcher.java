@@ -12,6 +12,7 @@ public class GetOnlinePlayersPatcher extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         if (name.equals("_INVALID_getOnlinePlayers")) {
+            System.out.println("Patching GOPP: " + name);
             name = "getOnlinePlayers";
         }
         return super.visitMethod(access, name, desc, signature, exceptions);

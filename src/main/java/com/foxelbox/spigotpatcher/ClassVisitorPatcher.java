@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class ClassVisitorPatcher extends ClassVisitor {
     static HashMap<String, HashMap<String, MethodPatcher>> methodVisitors = new HashMap<>();
-    static boolean haveCraftServer = false;
+    static int haveCraftServer = 0;
 
     static void addPatcher(String clazz, String method, MethodPatcher patcher) {
         HashMap<String, MethodPatcher> patcherMap = methodVisitors.get(clazz);
@@ -40,13 +40,13 @@ public class ClassVisitorPatcher extends ClassVisitor {
                 ClassVisitorPatcher patcher = new ClassVisitorPatcher(classWriter, methodVisitors.remove(myClassName));
                 classReader.accept(patcher, 0);
                 return classWriter.toByteArray();
-            } else if(myClassName.equals("CraftServer")) {
+            } else if(myClassName.equals("CraftServer") || myClassName.equals("Server")) {
                 ClassReader classReader = new ClassReader(classfileBuffer);
                 ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
                 classReader.accept(new GetOnlinePlayersPatcher(classWriter), 0);
-                haveCraftServer = true;
+                haveCraftServer++;
                 return classWriter.toByteArray();
-            } else if(methodVisitors.isEmpty() && haveCraftServer) {
+            } else if(methodVisitors.isEmpty() && haveCraftServer >= 2) {
                 SpigotPatcherPremain.instrumentation.removeTransformer(this);
                 SpigotPatcherPremain.instrumentation = null;
                 methodVisitors = null;
